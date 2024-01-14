@@ -436,15 +436,15 @@ namespace RiivolutionIsoBuilder
                     string extPath = extDir + "\\files" + filePatch.disc;
                     //Console.WriteLine("Copying " + path + " to " + extPath);
 
-                    if ((filePatch.disc == null || filePatch.disc == "") ? true : Directory.Exists(extPath)) // Avoid running useless copy commands for folders that doesn't exist AND don't have the "created" flag enabled (this is used for region-specific folders in NewerSMBW, for example)
+                    if ((filePatch.disc == null || filePatch.disc == "") ? true : filePatch.create) // Avoid running useless copy commands for files that don't exist AND don't have the "created" flag enabled.
                     {
                         if (filePatch.disc != "" && filePatch.disc != null)
                         {
                             if (!isSilent) Console.WriteLine("Copying " + patch.root + "\\" + filePatch.external);
 
-                            copy.StartInfo.Arguments = "/C xcopy /b \"" + file + "\" \"" + extPath + "\"";
+                            copy.StartInfo.Arguments = "/C copy /b \"" + file + "\" \"" + extPath + "\"";
                         }
-                        else if (Directory.Exists(file))
+                        else if (System.IO.File.Exists(file))
                         {
                             if (!isSilent) Console.WriteLine("Searching manually for file named " + Path.GetFileName(file));
                             string foundFile = ProcessDirectory(extDir + "\\files\\", Path.GetFileName(file));
@@ -452,10 +452,6 @@ namespace RiivolutionIsoBuilder
                             {
                                 if (!isSilent) Console.WriteLine("Found file " + foundFile);
                                 copy.StartInfo.Arguments = "/C copy /b \"" + file + "\" \"" + foundFile + "\"";
-
-                                copy.Start();
-                                if (!isSilent) Console.WriteLine(copy.StandardOutput.ReadToEnd());
-                                copy.WaitForExit();
                             }
                             else
                             {
